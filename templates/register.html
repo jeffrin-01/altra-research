@@ -1,10 +1,10 @@
-<!-- templates/contact.html -->
+<!-- templates/register.html -->
 {% extends "base.html" %}
-{% block title %}Contact - Altra Research{% endblock %}
+{% block title %}Register - Altra Research{% endblock %}
 {% block content %}
 <style>
-    .contact-container {
-        max-width: 700px;
+    .register-container {
+        max-width: 500px;
         margin: 0 auto;
         animation: fadeIn 0.5s ease;
     }
@@ -14,63 +14,15 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .contact-header {
+    .register-header {
         text-align: center;
         margin-bottom: 30px;
     }
 
-    .contact-header h2 {
+    .register-header h2 {
         color: var(--primary-color);
         font-size: clamp(24px, 5vw, 32px);
         margin-bottom: 10px;
-    }
-
-    .contact-info {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
-    .info-card {
-        background: var(--light-bg);
-        padding: 20px;
-        border-radius: var(--border-radius);
-        text-align: center;
-        transition: var(--transition);
-    }
-
-    .info-card:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--box-shadow);
-    }
-
-    .info-icon {
-        font-size: clamp(32px, 6vw, 40px);
-        margin-bottom: 10px;
-    }
-
-    .info-card h4 {
-        color: var(--primary-color);
-        margin-bottom: 5px;
-        font-size: clamp(16px, 3vw, 18px);
-    }
-
-    .info-card p {
-        color: #666;
-        font-size: clamp(14px, 2.5vw, 16px);
-    }
-
-    .form-section {
-        background: var(--light-bg);
-        padding: 30px;
-        border-radius: var(--border-radius);
-    }
-
-    .form-section h3 {
-        color: var(--primary-color);
-        margin-bottom: 20px;
-        font-size: clamp(18px, 3.5vw, 22px);
     }
 
     .form-group {
@@ -85,31 +37,27 @@
         font-size: clamp(14px, 2.5vw, 16px);
     }
 
-    .form-input, .form-textarea {
+    .form-input {
         width: 100%;
         padding: 12px 15px;
         border: 2px solid #e0e0e0;
         border-radius: 8px;
         font-size: clamp(14px, 2.5vw, 16px);
         transition: var(--transition);
-        background: var(--white);
+        background: var(--light-bg);
         min-height: 44px;
     }
 
-    .form-textarea {
-        min-height: 120px;
-        resize: vertical;
-    }
-
-    .form-input:focus, .form-textarea:focus {
+    .form-input:focus {
         outline: none;
         border-color: var(--accent-color);
         box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.1);
+        background: var(--white);
     }
 
     .submit-btn {
         width: 100%;
-        padding: 16px;
+        padding: 14px;
         background: var(--primary-color);
         color: var(--white);
         border: none;
@@ -119,6 +67,7 @@
         cursor: pointer;
         transition: var(--transition);
         min-height: 44px;
+        margin-top: 10px;
     }
 
     .submit-btn:hover, .submit-btn:focus {
@@ -132,105 +81,92 @@
         transform: translateY(0);
     }
 
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+        color: #666;
+        font-size: clamp(14px, 2.5vw, 16px);
+    }
+
+    .login-link a {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 600;
+        padding: 5px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+
     .required {
         color: #c62828;
         margin-left: 4px;
     }
-
-    @media (max-width: 480px) {
-        .contact-info {
-            grid-template-columns: 1fr;
-        }
-        .form-section { padding: 20px; }
-    }
 </style>
 
-<div class="contact-container">
-    <div class="contact-header">
-        <h2>📞 Contact Altra Research</h2>
-        <p style="color: #666; font-size: clamp(14px, 2.5vw, 16px);">We'd love to hear from you</p>
+<div class="register-container">
+    <div class="register-header">
+        <h2>📝 Create Account</h2>
+        <p style="color: #666;">Join Altra Research's talent network</p>
     </div>
 
-    <div class="contact-info">
-        <div class="info-card">
-            <div class="info-icon">📍</div>
-            <h4>Address</h4>
-            <p>EruthoorKadai Junction<br>Palliyadi Rd.</p>
+    <form method="POST" action="{{ url_for('register') }}" autocomplete="on">
+        <div class="form-group">
+            <label for="full_name">Full Name <span class="required">*</span></label>
+            <input type="text" id="full_name" name="full_name" class="form-input" 
+                   required placeholder="John Doe" tabindex="0"
+                   autocomplete="name" aria-label="Full name">
         </div>
-        <div class="info-card">
-            <div class="info-icon">📧</div>
-            <h4>Email</h4>
-            <p>careers@altraresearch.com<br>info@altraresearch.com</p>
+
+        <div class="form-group">
+            <label for="username">Username <span class="required">*</span></label>
+            <input type="text" id="username" name="username" class="form-input" 
+                   required placeholder="johndoe" tabindex="0"
+                   autocomplete="username" aria-label="Username">
         </div>
-        <div class="info-card">
-            <div class="info-icon">📱</div>
-            <h4>Phone</h4>
-            <p>+91 98765 43210<br>Mon-Fri, 9AM-6PM</p>
+
+        <div class="form-group">
+            <label for="email">Email Address <span class="required">*</span></label>
+            <input type="email" id="email" name="email" class="form-input" 
+                   required placeholder="john@example.com" tabindex="0"
+                   autocomplete="email" aria-label="Email address">
         </div>
-    </div>
 
-    <div class="form-section">
-        <h3>💬 Send Us a Message</h3>
-        <form method="POST" action="{{ url_for('contact') }}" id="contactForm">
-            <div class="form-group">
-                <label for="name">Full Name <span class="required">*</span></label>
-                <input type="text" id="name" name="name" class="form-input" 
-                       required placeholder="John Doe" tabindex="0"
-                       aria-label="Full name">
-            </div>
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" class="form-input" 
+                   placeholder="+1 (555) 123-4567" tabindex="0"
+                   autocomplete="tel" aria-label="Phone number">
+        </div>
 
-            <div class="form-group">
-                <label for="email">Email Address <span class="required">*</span></label>
-                <input type="email" id="email" name="email" class="form-input" 
-                       required placeholder="john@example.com" tabindex="0"
-                       aria-label="Email address">
-            </div>
+        <div class="form-group">
+            <label for="password">Password <span class="required">*</span></label>
+            <input type="password" id="password" name="password" class="form-input" 
+                   required placeholder="Min. 8 characters" tabindex="0"
+                   autocomplete="new-password" aria-label="Password"
+                   minlength="8">
+        </div>
 
-            <div class="form-group">
-                <label for="subject">Subject</label>
-                <input type="text" id="subject" name="subject" class="form-input" 
-                       placeholder="Job inquiry, Collaboration, etc." tabindex="0"
-                       aria-label="Subject">
-            </div>
+        <button type="submit" class="submit-btn" tabindex="0">
+            🎉 Create Account
+        </button>
+    </form>
 
-            <div class="form-group">
-                <label for="message">Message <span class="required">*</span></label>
-                <textarea id="message" name="message" class="form-textarea" 
-                          required placeholder="Type your message here..." 
-                          tabindex="0" aria-label="Message"></textarea>
-            </div>
-
-            <button type="submit" class="submit-btn" tabindex="0">
-                📨 Send Message
-            </button>
-        </form>
+    <div class="login-link">
+        Already have an account? <a href="{{ url_for('login') }}" tabindex="0">Sign in</a>
     </div>
 </div>
 
 <script>
-    // Form validation
-    document.getElementById('contactForm').addEventListener('submit', function(e) {
-        const name = document.getElementById('name').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const message = document.getElementById('message').value.trim();
-        
-        if (!name || !email || !message) {
+    // Password validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        if (password.length < 8) {
             e.preventDefault();
-            alert('Please fill in all required fields');
-            return false;
-        }
-        
-        if (!isValidEmail(email)) {
-            e.preventDefault();
-            alert('Please enter a valid email address');
+            alert('Password must be at least 8 characters long');
             return false;
         }
     });
-
-    function isValidEmail(email) {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
-    }
 
     // Touch feedback
     document.querySelector('.submit-btn').addEventListener('touchstart', function() {
