@@ -1,0 +1,255 @@
+<!-- templates/base.html - Base template with responsive design -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#1a237e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>{% block title %}Altra Research{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #283593;
+            --accent-color: #3949ab;
+            --success-color: #2e7d32;
+            --error-color: #c62828;
+            --text-color: #212121;
+            --light-bg: #f5f5f5;
+            --white: #ffffff;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --max-width: 1200px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-color);
+            line-height: 1.6;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--white);
+            padding: 20px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: clamp(20px, 4vw, 28px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 i {
+            color: var(--accent-color);
+            font-size: clamp(24px, 5vw, 32px);
+        }
+
+        .company-subtitle {
+            color: #666;
+            font-size: clamp(12px, 2.5vw, 14px);
+            margin-top: 5px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: var(--accent-color);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: clamp(14px, 2.5vw, 16px);
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);
+            min-height: 44px;
+            min-width: 44px;
+            justify-content: center;
+        }
+
+        .nav-btn:hover, .nav-btn:focus {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 35, 126, 0.3);
+            outline: none;
+        }
+
+        .nav-btn:active {
+            transform: translateY(0);
+        }
+
+        .logout-btn {
+            background: #dc3545;
+        }
+
+        .logout-btn:hover, .logout-btn:focus {
+            background: #c82333;
+        }
+
+        .main-content {
+            background: var(--white);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            flex: 1;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .flash-success {
+            background: #d4edda;
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .flash-error {
+            background: #f8d7da;
+            color: var(--error-color);
+            border-left: 4px solid var(--error-color);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            .header { 
+                padding: 15px 20px;
+                flex-direction: column;
+                text-align: center;
+            }
+            .nav-menu {
+                justify-content: center;
+                width: 100%;
+            }
+            .nav-btn {
+                flex: 1;
+                font-size: 14px;
+                padding: 12px 15px;
+            }
+            .main-content { padding: 20px; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 5px; }
+            .header { padding: 15px; }
+            .main-content { padding: 15px; }
+            .nav-btn { 
+                font-size: 12px;
+                padding: 10px;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .main-content { padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div>
+                <h1>
+                    <span>🔬</span>
+                    Altra Research
+                </h1>
+                <p class="company-subtitle">Innovating Tomorrow's Solutions Today</p>
+            </div>
+            <nav class="nav-menu">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="nav-btn" tabindex="0">
+                        <span>📊</span> Dashboard
+                    </a>
+                    <a href="{{ url_for('contact') }}" class="nav-btn" tabindex="0">
+                        <span>📞</span> Contact
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="nav-btn logout-btn" tabindex="0">
+                        <span>🚪</span> Logout
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="nav-btn" tabindex="0">
+                        <span>🔑</span> Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="nav-btn" tabindex="0">
+                        <span>📝</span> Register
+                    </a>
+                    <a href="{{ url_for('contact') }}" class="nav-btn" tabindex="0">
+                        <span>📞</span> Contact
+                    </a>
+                {% endif %}
+            </nav>
+        </header>
+
+        <main class="main-content" role="main">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}" role="alert">
+                                <span>{{ '✅' if category == 'success' else '❌' }}</span>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>
