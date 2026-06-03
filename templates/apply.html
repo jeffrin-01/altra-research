@@ -1,0 +1,278 @@
+<!-- templates/apply.html -->
+{% extends "base.html" %}
+{% block title %}Apply - {{ position }}{% endblock %}
+{% block content %}
+<style>
+    .apply-container {
+        max-width: 800px;
+        margin: 0 auto;
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .apply-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        color: var(--white);
+        padding: 30px;
+        border-radius: var(--border-radius);
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .apply-header h2 {
+        font-size: clamp(24px, 5vw, 32px);
+        margin-bottom: 10px;
+    }
+
+    .form-section {
+        background: var(--light-bg);
+        padding: 25px;
+        border-radius: var(--border-radius);
+        margin-bottom: 20px;
+    }
+
+    .form-section h3 {
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        font-size: clamp(18px, 3.5vw, 22px);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 500;
+        font-size: clamp(14px, 2.5vw, 16px);
+    }
+
+    .form-input, .form-textarea, .form-select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: clamp(14px, 2.5vw, 16px);
+        transition: var(--transition);
+        background: var(--white);
+        min-height: 44px;
+    }
+
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.1);
+    }
+
+    .file-upload {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .file-upload-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 15px;
+        background: var(--white);
+        border: 2px dashed var(--accent-color);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+        min-height: 60px;
+        font-weight: 500;
+        color: var(--accent-color);
+    }
+
+    .file-upload-label:hover, .file-upload-label:focus {
+        background: rgba(57, 73, 171, 0.05);
+        border-color: var(--primary-color);
+        outline: none;
+    }
+
+    .file-upload input[type="file"] {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .file-name {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #666;
+        display: none;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 16px;
+        background: var(--primary-color);
+        color: var(--white);
+        border: none;
+        border-radius: 8px;
+        font-size: clamp(16px, 3vw, 18px);
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        min-height: 44px;
+        margin-top: 20px;
+    }
+
+    .submit-btn:hover, .submit-btn:focus {
+        background: var(--secondary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(26, 35, 126, 0.3);
+        outline: none;
+    }
+
+    .submit-btn:active {
+        transform: translateY(0);
+    }
+
+    .required {
+        color: #c62828;
+        margin-left: 4px;
+    }
+
+    @media (max-width: 768px) {
+        .apply-header { padding: 20px; }
+        .form-section { padding: 20px; }
+    }
+
+    @media (max-width: 480px) {
+        .apply-header { padding: 15px; }
+        .form-section { padding: 15px; }
+    }
+</style>
+
+<div class="apply-container">
+    <div class="apply-header">
+        <h2>📝 Job Application</h2>
+        <p style="font-size: clamp(18px, 3.5vw, 20px); margin-top: 10px;">{{ position }}</p>
+        <p style="opacity: 0.9;">Altra Research</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="applicationForm">
+        <div class="form-section">
+            <h3>📄 Required Documents</h3>
+            
+            <div class="form-group">
+                <label for="resume">Upload Resume <span class="required">*</span></label>
+                <div class="file-upload">
+                    <label for="resume" class="file-upload-label" tabindex="0">
+                        <span>📎</span> Choose Resume File
+                    </label>
+                    <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" 
+                           required tabindex="0" aria-label="Upload resume">
+                    <div class="file-name" id="resume-name"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="cover_letter">Cover Letter</label>
+                <textarea id="cover_letter" name="cover_letter" class="form-textarea" 
+                          placeholder="Tell us why you're interested in this position..."
+                          tabindex="0" aria-label="Cover letter"></textarea>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>🔗 Professional Profiles</h3>
+            
+            <div class="form-group">
+                <label for="linkedin_profile">LinkedIn Profile URL</label>
+                <input type="url" id="linkedin_profile" name="linkedin_profile" class="form-input" 
+                       placeholder="https://linkedin.com/in/yourprofile"
+                       tabindex="0" aria-label="LinkedIn profile URL">
+            </div>
+
+            <div class="form-group">
+                <label for="github_profile">GitHub Profile URL</label>
+                <input type="url" id="github_profile" name="github_profile" class="form-input" 
+                       placeholder="https://github.com/yourusername"
+                       tabindex="0" aria-label="GitHub profile URL">
+            </div>
+
+            <div class="form-group">
+                <label for="portfolio_link">Portfolio Website</label>
+                <input type="url" id="portfolio_link" name="portfolio_link" class="form-input" 
+                       placeholder="https://yourportfolio.com"
+                       tabindex="0" aria-label="Portfolio website URL">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>📁 Additional Documents</h3>
+            
+            <div class="form-group">
+                <label for="additional_docs">Additional Documents (Certificates, References, etc.)</label>
+                <div class="file-upload">
+                    <label for="additional_docs" class="file-upload-label" tabindex="0">
+                        <span>📎</span> Choose Additional Files
+                    </label>
+                    <input type="file" id="additional_docs" name="additional_docs" 
+                           accept=".pdf,.doc,.docx,.jpg,.png"
+                           tabindex="0" aria-label="Upload additional documents">
+                    <div class="file-name" id="additional-docs-name"></div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn" tabindex="0">
+            🚀 Submit Application
+        </button>
+    </form>
+</div>
+
+<script>
+    // File upload display
+    document.getElementById('resume').addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name || 'No file chosen';
+        const nameDisplay = document.getElementById('resume-name');
+        nameDisplay.textContent = '📄 ' + fileName;
+        nameDisplay.style.display = 'block';
+    });
+
+    document.getElementById('additional_docs').addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name || 'No file chosen';
+        const nameDisplay = document.getElementById('additional-docs-name');
+        nameDisplay.textContent = '📄 ' + fileName;
+        nameDisplay.style.display = 'block';
+    });
+
+    // Form validation
+    document.getElementById('applicationForm').addEventListener('submit', function(e) {
+        const resume = document.getElementById('resume').files[0];
+        if (!resume) {
+            e.preventDefault();
+            alert('Please upload your resume');
+            return false;
+        }
+    });
+
+    // Touch feedback
+    document.querySelectorAll('.file-upload-label').forEach(label => {
+        label.addEventListener('touchstart', function() {
+            this.style.backgroundColor = 'rgba(57, 73, 171, 0.1)';
+        });
+        label.addEventListener('touchend', function() {
+            this.style.backgroundColor = '';
+        });
+    });
+</script>
+{% endblock %}

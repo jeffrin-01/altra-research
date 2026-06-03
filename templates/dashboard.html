@@ -1,0 +1,181 @@
+<!-- templates/dashboard.html -->
+{% extends "base.html" %}
+{% block title %}Dashboard - Altra Research{% endblock %}
+{% block content %}
+<style>
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .dashboard-header h2 {
+        color: var(--primary-color);
+        font-size: clamp(24px, 5vw, 32px);
+        margin-bottom: 10px;
+    }
+
+    .positions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .position-card {
+        background: var(--white);
+        border: 2px solid #e0e0e0;
+        border-radius: var(--border-radius);
+        padding: 20px;
+        transition: var(--transition);
+        cursor: pointer;
+        -webkit-tap-highlight-color: rgba(57, 73, 171, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .position-card:hover, .position-card:focus {
+        border-color: var(--accent-color);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        outline: none;
+    }
+
+    .position-card:active {
+        transform: translateY(-2px);
+    }
+
+    .position-title {
+        font-size: clamp(18px, 3.5vw, 20px);
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+
+    .position-details {
+        color: #666;
+        margin-bottom: 15px;
+    }
+
+    .position-details span {
+        display: inline-block;
+        margin-right: 15px;
+        margin-bottom: 5px;
+        font-size: clamp(12px, 2vw, 14px);
+    }
+
+    .apply-btn {
+        width: 100%;
+        padding: 12px;
+        background: var(--accent-color);
+        color: var(--white);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        min-height: 44px;
+        font-size: clamp(14px, 2.5vw, 16px);
+    }
+
+    .apply-btn:hover, .apply-btn:focus {
+        background: var(--secondary-color);
+        outline: none;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .badge-remote { background: #e3f2fd; color: #1565c0; }
+    .badge-onsite { background: #fce4ec; color: #c62828; }
+    .badge-hybrid { background: #f3e5f5; color: #6a1b9a; }
+
+    .welcome-message {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        color: var(--white);
+        padding: 20px;
+        border-radius: var(--border-radius);
+        margin-bottom: 30px;
+    }
+
+    @media (max-width: 480px) {
+        .positions-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (min-width: 768px) and (max-width: 1024px) {
+        .positions-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+<div class="dashboard-header">
+    <div class="welcome-message">
+        <h2>👋 Welcome, {{ current_user.full_name or current_user.username }}!</h2>
+        <p>Explore exciting career opportunities at Altra Research</p>
+    </div>
+</div>
+
+<h3 style="color: var(--primary-color); margin-bottom: 20px;">
+    📋 Open Positions
+</h3>
+
+<div class="positions-grid">
+    {% for position in positions %}
+    <div class="position-card" tabindex="0" 
+         onclick="applyForPosition('{{ position.title }}')"
+         onkeypress="if(event.key==='Enter') applyForPosition('{{ position.title }}')"
+         role="button" aria-label="Apply for {{ position.title }}">
+        <span class="badge badge-{{ position.location.lower() }}">{{ position.location }}</span>
+        <div class="position-title">{{ position.title }}</div>
+        <div class="position-details">
+            <span>🏢 {{ position.department }}</span>
+            <span>📍 {{ position.location }}</span>
+        </div>
+        <button class="apply-btn" onclick="event.stopPropagation(); applyForPosition('{{ position.title }}')">
+            Apply Now →
+        </button>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function applyForPosition(position) {
+        window.location.href = "{{ url_for('apply', position='') }}" + encodeURIComponent(position);
+    }
+
+    // Touch feedback for cards
+    document.querySelectorAll('.position-card').forEach(card => {
+        card.addEventListener('touchstart', function() {
+            this.style.transform = 'scale(0.98)';
+        });
+        card.addEventListener('touchend', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+
+    // Keyboard navigation between cards
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            const cards = Array.from(document.querySelectorAll('.position-card'));
+            const currentIndex = cards.indexOf(document.activeElement);
+            if (currentIndex < cards.length - 1) {
+                cards[currentIndex + 1].focus();
+            }
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            const cards = Array.from(document.querySelectorAll('.position-card'));
+            const currentIndex = cards.indexOf(document.activeElement);
+            if (currentIndex > 0) {
+                cards[currentIndex - 1].focus();
+            }
+        }
+    });
+</script>
+{% endblock %}
