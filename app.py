@@ -1,8 +1,10 @@
 """
-Altra Research - Job Application Portal
-Location: Eruthoorkadai
-Framework: Streamlit (Free Deployment)
-Contact: altraresearch@gmail.com
+╔══════════════════════════════════════════════════════════════╗
+║           ALTRA RESEARCH - Job Application Portal           ║
+║              Location: Eruthoorkadai, Tamil Nadu            ║
+║              Contact: altraresearch@gmail.com               ║
+║              Phone: +91 98765 43210                         ║
+╚══════════════════════════════════════════════════════════════╝
 """
 
 import streamlit as st
@@ -11,335 +13,76 @@ import re
 import time
 from datetime import datetime
 from streamlit_option_menu import option_menu
-import plotly.express as px
-import plotly.graph_objects as go
 import requests
-import json
 import os
 
-# Page configuration
+# ═══════════════════════════════════════════════
+# PAGE CONFIGURATION
+# ═══════════════════════════════════════════════
 st.set_page_config(
-    page_title="Altra Research - Careers",
-    page_icon="🏢",
+    page_title="Altra Research | Careers",
+    page_icon="🔬",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS - MAXIMUM VISIBILITY
+# ═══════════════════════════════════════════════
+# ULTIMATE CSS - MAXIMUM VISIBILITY & DESIGN
+# ═══════════════════════════════════════════════
 def load_css():
     st.markdown("""
     <style>
-    /* Import Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    /* ── Google Fonts ── */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap');
     
-    /* Global Reset - All Text Black by Default */
+    /* ── GLOBAL RESET ── */
     * {
         font-family: 'Inter', sans-serif !important;
     }
     
-    /* Main App Background - Light Gray */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', sans-serif !important;
+    }
+    
+    /* ── APP BACKGROUND ── */
     .stApp {
-        background: #e8eaed;
+        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0d1230 100%) !important;
+        background-attachment: fixed !important;
     }
     
-    /* Force ALL text to be dark */
-    p, span, div, li, label, h1, h2, h3, h4, h5, h6 {
-        color: #111827 !important;
+    /* ── MAIN SCROLLBAR ── */
+    ::-webkit-scrollbar {
+        width: 12px;
     }
     
-    /* Main Container - White */
+    ::-webkit-scrollbar-track {
+        background: #1a1f3a;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #4f46e5, #7c3aed);
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #6366f1, #8b5cf6);
+    }
+    
+    /* ── MAIN CONTAINER ── */
     .main-container {
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 35px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-        margin: 20px 0;
-        border: 2px solid #d1d5db;
+        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
+        margin: 25px 0;
+        animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255,255,255,0.2);
     }
     
-    /* Card Styling - High Contrast */
-    .job-card {
-        background: #ffffff;
-        border-radius: 15px;
-        padding: 25px;
-        margin: 15px 0;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-        border: 2px solid #9ca3af;
-        border-left: 6px solid #000000;
-        transition: all 0.3s ease;
-    }
-    
-    .job-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-        border-left: 6px solid #1d4ed8;
-        border-color: #1d4ed8;
-    }
-    
-    .job-card h3 {
-        font-size: 22px !important;
-        font-weight: 800 !important;
-        color: #000000 !important;
-    }
-    
-    .job-card p {
-        font-size: 16px !important;
-        font-weight: 500 !important;
-        color: #374151 !important;
-        line-height: 1.8 !important;
-    }
-    
-    .feature-card {
-        background: #ffffff;
-        border-radius: 15px;
-        padding: 30px;
-        margin: 15px 0;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-        border: 2px solid #9ca3af;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-    
-    .feature-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-        border-color: #1d4ed8;
-    }
-    
-    .feature-card h2 {
-        font-size: 38px !important;
-        font-weight: 900 !important;
-        color: #000000 !important;
-    }
-    
-    .feature-card h3 {
-        font-size: 20px !important;
-        font-weight: 700 !important;
-        color: #000000 !important;
-    }
-    
-    .feature-card p {
-        font-size: 16px !important;
-        font-weight: 500 !important;
-        color: #374151 !important;
-    }
-    
-    /* Button Styling - High Contrast */
-    .stButton > button {
-        background: #000000 !important;
-        color: #ffffff !important;
-        border: 3px solid #000000 !important;
-        padding: 16px 35px !important;
-        border-radius: 12px !important;
-        font-weight: 700 !important;
-        font-size: 18px !important;
-        text-transform: uppercase !important;
-        letter-spacing: 1.5px !important;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .stButton > button:hover {
-        background: #1d4ed8 !important;
-        border-color: #1d4ed8 !important;
-        color: #ffffff !important;
-        transform: translateY(-4px) !important;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.4) !important;
-    }
-    
-    /* Form Inputs - Clear & Visible */
-    .stTextInput > div > div > input,
-    .stTextArea > div > div > textarea,
-    .stSelectbox > div > div > select,
-    .stNumberInput > div > div > input {
-        border-radius: 10px !important;
-        border: 3px solid #6b7280 !important;
-        padding: 14px !important;
-        font-size: 16px !important;
-        font-weight: 500 !important;
-        color: #000000 !important;
-        background-color: #ffffff !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .stTextInput > div > div > input:focus,
-    .stTextArea > div > div > textarea:focus {
-        border-color: #000000 !important;
-        border-width: 3px !important;
-        box-shadow: 0 0 0 4px rgba(0,0,0,0.1) !important;
-        background-color: #f9fafb !important;
-    }
-    
-    /* Form Labels - Big & Bold */
-    .stTextInput label, 
-    .stTextArea label, 
-    .stSelectbox label, 
-    .stNumberInput label {
-        font-size: 16px !important;
-        font-weight: 700 !important;
-        color: #000000 !important;
-        margin-bottom: 8px !important;
-    }
-    
-    /* Placeholder Text */
-    ::placeholder {
-        color: #6b7280 !important;
-        font-weight: 500 !important;
-        font-size: 15px !important;
-    }
-    
-    /* Success Message */
-    .success-message {
-        background: #000000 !important;
-        color: #ffffff !important;
-        padding: 25px !important;
-        border-radius: 12px !important;
-        border: 3px solid #000000 !important;
-        margin: 20px 0 !important;
-    }
-    
-    .success-message h2 {
-        font-size: 24px !important;
-        font-weight: 800 !important;
-        color: #ffffff !important;
-    }
-    
-    .success-message p {
-        font-size: 17px !important;
-        font-weight: 600 !important;
-        color: #e5e7eb !important;
-        margin: 12px 0 !important;
-    }
-    
-    /* Error Message */
-    .error-message {
-        background: #dc2626 !important;
-        color: #ffffff !important;
-        padding: 20px !important;
-        border-radius: 12px !important;
-        border: 3px solid #991b1b !important;
-        margin: 15px 0 !important;
-        font-size: 16px !important;
-        font-weight: 700 !important;
-    }
-    
-    /* Badge Styling */
-    .badge {
-        background: #000000 !important;
-        color: #ffffff !important;
-        padding: 8px 18px !important;
-        border-radius: 25px !important;
-        font-size: 14px !important;
-        font-weight: 700 !important;
-        display: inline-block !important;
-        margin: 6px !important;
-        border: 2px solid #000000 !important;
-    }
-    
-    /* Sidebar - Dark with White Text */
-    [data-testid="stSidebar"] {
-        background: #000000 !important;
-        border-right: 4px solid #374151 !important;
-    }
-    
-    [data-testid="stSidebar"] * {
-        color: #ffffff !important;
-        font-weight: 600 !important;
-    }
-    
-    [data-testid="stSidebar"] h1 {
-        font-size: 28px !important;
-        font-weight: 900 !important;
-        color: #ffffff !important;
-    }
-    
-    [data-testid="stSidebar"] p {
-        font-size: 15px !important;
-        color: #d1d5db !important;
-    }
-    
-    /* Progress Bar */
-    .stProgress > div > div > div > div {
-        background: #000000 !important;
-        height: 8px !important;
-        border-radius: 10px !important;
-    }
-    
-    .stProgress > div {
-        background: #d1d5db !important;
-        border-radius: 10px !important;
-        height: 8px !important;
-    }
-    
-    /* Headers - Extra Bold & Large */
-    h1 {
-        font-size: 40px !important;
-        font-weight: 900 !important;
-        color: #000000 !important;
-        margin-bottom: 20px !important;
-    }
-    
-    h2 {
-        font-size: 30px !important;
-        font-weight: 800 !important;
-        color: #000000 !important;
-        margin-bottom: 15px !important;
-    }
-    
-    h3 {
-        font-size: 22px !important;
-        font-weight: 700 !important;
-        color: #000000 !important;
-    }
-    
-    /* Info Box */
-    .stAlert {
-        font-size: 16px !important;
-        font-weight: 600 !important;
-        border: 3px solid #000000 !important;
-        border-radius: 10px !important;
-    }
-    
-    /* File Uploader */
-    [data-testid="stFileUploader"] {
-        border: 3px dashed #6b7280 !important;
-        border-radius: 10px !important;
-        padding: 20px !important;
-        font-size: 16px !important;
-        font-weight: 600 !important;
-    }
-    
-    [data-testid="stFileUploader"]:hover {
-        border-color: #000000 !important;
-        background: #f9fafb !important;
-    }
-    
-    /* Select Box Options */
-    .stSelectbox div[data-baseweb="select"] > div {
-        background-color: #ffffff !important;
-        border: 3px solid #6b7280 !important;
-        font-weight: 600 !important;
-        font-size: 16px !important;
-    }
-    
-    /* Timeline */
-    .timeline-year {
-        background: #000000 !important;
-        color: #ffffff !important;
-        padding: 12px 25px !important;
-        border-radius: 25px !important;
-        font-weight: 800 !important;
-        font-size: 18px !important;
-        min-width: 90px !important;
-        text-align: center !important;
-        display: inline-block !important;
-    }
-    
-    /* Animation Keyframes */
-    @keyframes slideIn {
+    @keyframes fadeInUp {
         from {
             opacity: 0;
-            transform: translateY(40px);
+            transform: translateY(60px);
         }
         to {
             opacity: 1;
@@ -347,60 +90,511 @@ def load_css():
         }
     }
     
-    .main-container {
-        animation: slideIn 0.6s ease-out;
+    @keyframes glow {
+        0%, 100% { box-shadow: 0 0 20px rgba(79, 70, 229, 0.3); }
+        50% { box-shadow: 0 0 40px rgba(124, 58, 237, 0.5); }
     }
     
-    /* Pulse Animation */
-    .pulse {
-        animation: pulse 2s infinite;
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
     }
     
     @keyframes pulse {
-        0% {
-            transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.4);
-        }
-        70% {
-            transform: scale(1.03);
-            box-shadow: 0 0 0 15px rgba(0, 0, 0, 0);
-        }
-        100% {
-            transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
-        }
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
     }
     
-    /* Mobile Responsive */
+    @keyframes shimmer {
+        0% { background-position: -200% center; }
+        100% { background-position: 200% center; }
+    }
+    
+    @keyframes borderGlow {
+        0%, 100% { border-color: #4f46e5; box-shadow: 0 0 15px rgba(79, 70, 229, 0.3); }
+        50% { border-color: #7c3aed; box-shadow: 0 0 30px rgba(124, 58, 237, 0.5); }
+    }
+    
+    /* ── HERO SECTION ── */
+    .hero-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: #ffffff;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+    }
+    
+    .hero-title {
+        font-size: 56px !important;
+        font-weight: 900 !important;
+        color: #0f172a !important;
+        line-height: 1.1 !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .hero-title-gradient {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .hero-subtitle {
+        font-size: 20px !important;
+        font-weight: 500 !important;
+        color: #475569 !important;
+        line-height: 1.6 !important;
+    }
+    
+    /* ── STAT CARDS ── */
+    .stat-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 30px 20px;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 2px solid #e2e8f0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #4f46e5, #7c3aed, #a855f7);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(79, 70, 229, 0.2);
+        border-color: #4f46e5;
+        animation: borderGlow 2s infinite;
+    }
+    
+    .stat-number {
+        font-size: 48px !important;
+        font-weight: 900 !important;
+        color: #0f172a !important;
+        margin: 10px 0 !important;
+    }
+    
+    .stat-label {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: #64748b !important;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+    
+    /* ── FEATURE CARDS ── */
+    .feature-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 35px 25px;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 2px solid #e2e8f0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 25px 60px rgba(79, 70, 229, 0.25);
+        border-color: #4f46e5;
+    }
+    
+    .feature-icon {
+        font-size: 60px;
+        margin-bottom: 20px;
+        display: block;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    .feature-title {
+        font-size: 22px !important;
+        font-weight: 800 !important;
+        color: #0f172a !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .feature-desc {
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        color: #64748b !important;
+        line-height: 1.7 !important;
+    }
+    
+    /* ── JOB CARDS ── */
+    .job-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 30px;
+        margin: 20px 0;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 2px solid #e2e8f0;
+        border-left: 6px solid #4f46e5;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .job-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 150px;
+        height: 150px;
+        background: linear-gradient(135deg, rgba(79,70,229,0.05), rgba(124,58,237,0.05));
+        border-radius: 0 0 0 100%;
+    }
+    
+    .job-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 60px rgba(79, 70, 229, 0.25);
+        border-left: 6px solid #7c3aed;
+        border-color: #4f46e5;
+    }
+    
+    .job-title {
+        font-size: 24px !important;
+        font-weight: 800 !important;
+        color: #0f172a !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .job-company {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: #4f46e5 !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .job-desc {
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        color: #475569 !important;
+        line-height: 1.8 !important;
+        margin: 15px 0 !important;
+    }
+    
+    /* ── BADGES ── */
+    .badge {
+        display: inline-block;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 700;
+        margin: 5px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+    
+    .badge-primary {
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        color: #ffffff;
+    }
+    
+    .badge-success {
+        background: linear-gradient(135deg, #059669, #10b981);
+        color: #ffffff;
+    }
+    
+    .badge-warning {
+        background: linear-gradient(135deg, #d97706, #f59e0b);
+        color: #ffffff;
+    }
+    
+    .badge-info {
+        background: linear-gradient(135deg, #0284c7, #38bdf8);
+        color: #ffffff;
+    }
+    
+    .badge-purple {
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
+        color: #ffffff;
+    }
+    
+    /* ── BUTTONS ── */
+    .stButton > button {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+        color: #ffffff !important;
+        border: none !important;
+        padding: 16px 35px !important;
+        border-radius: 50px !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3) !important;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+    
+    .stButton > button::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-5px) !important;
+        box-shadow: 0 20px 40px rgba(79, 70, 229, 0.5) !important;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    }
+    
+    .stButton > button:hover::before {
+        width: 400px;
+        height: 400px;
+    }
+    
+    /* ── FORM INPUTS ── */
+    .stTextInput > div > div > input,
+    .stTextArea > div > div > textarea,
+    .stSelectbox > div > div > select,
+    .stNumberInput > div > div > input {
+        border-radius: 12px !important;
+        border: 2.5px solid #cbd5e1 !important;
+        padding: 14px 18px !important;
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        color: #0f172a !important;
+        background-color: #ffffff !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stTextInput > div > div > input:focus,
+    .stTextArea > div > div > textarea:focus,
+    .stSelectbox > div > div > select:focus,
+    .stNumberInput > div > div > input:focus {
+        border-color: #4f46e5 !important;
+        border-width: 3px !important;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1) !important;
+        outline: none !important;
+    }
+    
+    /* ── LABELS ── */
+    .stTextInput label, 
+    .stTextArea label, 
+    .stSelectbox label, 
+    .stNumberInput label {
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+        margin-bottom: 8px !important;
+        letter-spacing: 0.5px !important;
+        text-transform: uppercase !important;
+    }
+    
+    /* ── SUCCESS MESSAGE ── */
+    .success-box {
+        background: linear-gradient(135deg, #059669, #10b981);
+        color: #ffffff;
+        padding: 30px;
+        border-radius: 20px;
+        border: 3px solid #047857;
+        margin: 20px 0;
+        box-shadow: 0 15px 40px rgba(5, 150, 105, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .success-box h2 {
+        color: #ffffff !important;
+        font-size: 26px !important;
+        font-weight: 800 !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .success-box p {
+        color: #ecfdf5 !important;
+        font-size: 17px !important;
+        font-weight: 500 !important;
+    }
+    
+    /* ── ERROR MESSAGE ── */
+    .error-box {
+        background: #dc2626;
+        color: #ffffff;
+        padding: 20px;
+        border-radius: 15px;
+        border: 3px solid #991b1b;
+        margin: 15px 0;
+        font-size: 16px;
+        font-weight: 700;
+        box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);
+        animation: shake 0.5s ease-out;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-15px); }
+        40% { transform: translateX(15px); }
+        60% { transform: translateX(-10px); }
+        80% { transform: translateX(10px); }
+    }
+    
+    /* ── SIDEBAR ── */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0a0e27 0%, #1a1040 50%, #0d1230 100%) !important;
+        border-right: 2px solid rgba(255,255,255,0.1) !important;
+    }
+    
+    [data-testid="stSidebar"] * {
+        color: #ffffff !important;
+    }
+    
+    [data-testid="stSidebar"] h1 {
+        font-size: 28px !important;
+        font-weight: 900 !important;
+        letter-spacing: 1px !important;
+    }
+    
+    [data-testid="stSidebar"] .stMarkdown p {
+        font-size: 14px !important;
+        color: #cbd5e1 !important;
+    }
+    
+    /* ── PROGRESS BAR ── */
+    .stProgress > div {
+        background: #e2e8f0 !important;
+        border-radius: 20px !important;
+        height: 10px !important;
+    }
+    
+    .stProgress > div > div > div {
+        background: linear-gradient(90deg, #4f46e5, #7c3aed, #a855f7) !important;
+        border-radius: 20px !important;
+        height: 10px !important;
+        animation: shimmer 2s linear infinite;
+        background-size: 200% auto;
+    }
+    
+    /* ── SECTION DIVIDERS ── */
+    .section-divider {
+        height: 4px;
+        background: linear-gradient(90deg, transparent, #4f46e5, #7c3aed, #a855f7, transparent);
+        border-radius: 2px;
+        margin: 40px 0;
+    }
+    
+    /* ── GLOW CARD ── */
+    .glow-card {
+        background: linear-gradient(145deg, #ffffff, #f8fafc);
+        border-radius: 20px;
+        padding: 40px;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        animation: glow 3s infinite;
+    }
+    
+    /* ── TIMELINE ── */
+    .timeline-item {
+        display: flex;
+        align-items: center;
+        margin: 25px 0;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 15px;
+        border-left: 5px solid #4f46e5;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .timeline-item:hover {
+        transform: translateX(10px);
+        box-shadow: 0 10px 30px rgba(79, 70, 229, 0.15);
+    }
+    
+    .timeline-year {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: #ffffff;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-weight: 800;
+        font-size: 18px;
+        min-width: 100px;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+    }
+    
+    .timeline-text {
+        margin-left: 25px;
+        font-size: 18px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    /* ── CONTACT INFO CARD ── */
+    .contact-card {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 15px;
+        border: 2px solid #e2e8f0;
+        margin: 15px 0;
+        transition: all 0.3s ease;
+    }
+    
+    .contact-card:hover {
+        border-color: #4f46e5;
+        box-shadow: 0 10px 30px rgba(79, 70, 229, 0.15);
+        transform: translateX(5px);
+    }
+    
+    /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
+        .hero-title {
+            font-size: 36px !important;
+        }
+        
+        .hero-subtitle {
+            font-size: 16px !important;
+        }
+        
         .main-container {
             padding: 20px;
             margin: 10px;
         }
         
-        h1 {
-            font-size: 28px !important;
+        .stat-number {
+            font-size: 32px !important;
         }
         
-        h2 {
-            font-size: 22px !important;
+        .job-card {
+            padding: 20px;
         }
         
         .stButton > button {
             width: 100%;
             padding: 14px 25px !important;
-            font-size: 16px !important;
-        }
-        
-        .job-card, .feature-card {
-            padding: 15px;
-            margin: 10px 0;
         }
     }
     </style>
     """, unsafe_allow_html=True)
 
-# Initialize database
+# ═══════════════════════════════════════════════
+# DATABASE SETUP
+# ═══════════════════════════════════════════════
 def init_database():
     conn = sqlite3.connect('altra_research.db')
     c = conn.cursor()
@@ -415,7 +609,6 @@ def init_database():
                   education TEXT,
                   skills TEXT,
                   cover_letter TEXT,
-                  resume TEXT,
                   applied_date TIMESTAMP,
                   status TEXT DEFAULT 'Pending')''')
     
@@ -430,17 +623,17 @@ def init_database():
     conn.commit()
     conn.close()
 
-# Email validation
+# ═══════════════════════════════════════════════
+# VALIDATION FUNCTIONS
+# ═══════════════════════════════════════════════
 def is_valid_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 
-# Phone validation
 def is_valid_phone(phone):
     pattern = r'^\+?1?\d{9,15}$'
     return re.match(pattern, phone) is not None
 
-# Save application
 def save_application(data):
     conn = sqlite3.connect('altra_research.db')
     c = conn.cursor()
@@ -453,175 +646,170 @@ def save_application(data):
     conn.commit()
     conn.close()
 
-# Main app
+# ═══════════════════════════════════════════════
+# MAIN APP
+# ═══════════════════════════════════════════════
 def main():
     load_css()
     init_database()
     
-    # Sidebar
+    # SIDEBAR
     with st.sidebar:
         st.markdown("""
-        <div style='text-align: center; padding: 30px 10px;'>
-            <h1 style='font-size: 30px !important; font-weight: 900 !important; 
-                       color: #ffffff !important; margin-bottom: 10px !important;'>
-                🔬 ALTRA RESEARCH
+        <div style='text-align: center; padding: 30px 15px;'>
+            <div style='font-size: 60px; margin-bottom: 15px;'>🔬</div>
+            <h1 style='font-size: 26px; font-weight: 900; margin-bottom: 5px; letter-spacing: 2px;'>
+                ALTRA RESEARCH
             </h1>
-            <p style='font-size: 16px !important; color: #d1d5db !important; 
-                      font-weight: 600 !important; margin-bottom: 5px !important;'>
+            <p style='font-size: 13px; color: #94a3b8; font-weight: 500; letter-spacing: 3px; text-transform: uppercase;'>
                 Innovation Meets Excellence
             </p>
-            <div style='height: 4px; background: #ffffff; margin: 25px 0; border-radius: 2px;'></div>
+            <div style='height: 3px; background: linear-gradient(90deg, #4f46e5, #7c3aed, #a855f7); 
+                        margin: 25px 0; border-radius: 3px;'></div>
         </div>
         """, unsafe_allow_html=True)
         
         selected = option_menu(
             menu_title=None,
-            options=["🏠 Home", "💼 Jobs", "📝 Apply Now", "ℹ️ About Us", "📧 Contact"],
-            icons=["house", "briefcase", "pencil-square", "info-circle", "envelope"],
-            menu_icon="cast",
+            options=["🏠 HOME", "💼 OPEN POSITIONS", "📝 APPLY NOW", "ℹ️ ABOUT US", "📧 CONTACT"],
+            icons=["house-fill", "briefcase-fill", "pencil-square", "info-circle-fill", "envelope-fill"],
             default_index=0,
             styles={
                 "container": {"padding": "0!important", "background-color": "transparent"},
-                "icon": {"font-size": "18px", "color": "#ffffff"}, 
+                "icon": {"font-size": "18px", "color": "#ffffff"},
                 "nav-link": {
-                    "font-size": "17px", 
-                    "text-align": "left", 
-                    "margin": "8px 0", 
-                    "padding": "14px",
-                    "border-radius": "10px",
+                    "font-size": "15px",
+                    "text-align": "left",
+                    "margin": "8px 0",
+                    "padding": "14px 18px",
+                    "border-radius": "12px",
                     "color": "#ffffff",
-                    "font-weight": "600"
+                    "font-weight": "600",
+                    "letter-spacing": "0.5px"
                 },
                 "nav-link-selected": {
-                    "background": "rgba(255,255,255,0.25)",
+                    "background": "linear-gradient(135deg, rgba(79,70,229,0.4), rgba(124,58,237,0.4))",
                     "font-weight": "800",
-                    "color": "#ffffff"
+                    "border": "1px solid rgba(255,255,255,0.2)"
                 },
             }
         )
         
         st.markdown("""
-        <div style='margin-top: 30px; padding-top: 25px; border-top: 2px solid rgba(255,255,255,0.3);'>
-            <p style='margin: 10px 0; font-size: 15px !important; color: #ffffff !important; font-weight: 600;'>
-                📍 Eruthoorkadai
-            </p>
-            <p style='margin: 10px 0; font-size: 15px !important; color: #ffffff !important; font-weight: 600;'>
-                📧 altraresearch@gmail.com
-            </p>
-            <p style='margin: 10px 0; font-size: 15px !important; color: #ffffff !important; font-weight: 600;'>
-                📞 +91 98765 43210
-            </p>
+        <div style='margin-top: 40px; padding-top: 25px; border-top: 2px solid rgba(255,255,255,0.15);'>
+            <div style='display: flex; align-items: center; margin: 15px 0;'>
+                <span style='font-size: 20px; margin-right: 10px;'>📍</span>
+                <span style='font-size: 13px; font-weight: 500; color: #cbd5e1;'>Eruthoorkadai, Tamil Nadu</span>
+            </div>
+            <div style='display: flex; align-items: center; margin: 15px 0;'>
+                <span style='font-size: 20px; margin-right: 10px;'>📧</span>
+                <span style='font-size: 13px; font-weight: 500; color: #cbd5e1;'>altraresearch@gmail.com</span>
+            </div>
+            <div style='display: flex; align-items: center; margin: 15px 0;'>
+                <span style='font-size: 20px; margin-right: 10px;'>📞</span>
+                <span style='font-size: 13px; font-weight: 500; color: #cbd5e1;'>+91 98765 43210</span>
+            </div>
         </div>
         """, unsafe_allow_html=True)
     
-    # Page routing
-    if selected == "🏠 Home":
+    # PAGE ROUTING
+    if selected == "🏠 HOME":
         home_page()
-    elif selected == "💼 Jobs":
+    elif selected == "💼 OPEN POSITIONS":
         jobs_page()
-    elif selected == "📝 Apply Now":
+    elif selected == "📝 APPLY NOW":
         apply_page()
-    elif selected == "ℹ️ About Us":
+    elif selected == "ℹ️ ABOUT US":
         about_page()
-    elif selected == "📧 Contact":
+    elif selected == "📧 CONTACT":
         contact_page()
 
-# Home Page
+# ═══════════════════════════════════════════════
+# HOME PAGE
+# ═══════════════════════════════════════════════
 def home_page():
     st.markdown("<div class='main-container'>", unsafe_allow_html=True)
     
-    col1, col2 = st.columns([2, 1])
+    col1, col2 = st.columns([1.5, 1])
     
     with col1:
+        st.markdown('<span class="hero-badge">🚀 We Are Hiring!</span>', unsafe_allow_html=True)
         st.markdown("""
-        <h1 style='font-size: 44px !important; font-weight: 900 !important; 
-                   color: #000000 !important; margin-bottom: 15px !important;'>
-            Welcome to <span style='color: #1d4ed8 !important; 
-            text-decoration: underline; text-underline-offset: 8px;'>Altra Research</span>
+        <h1 class='hero-title'>
+            Build The Future<br>
+            With <span class='hero-title-gradient'>Altra Research</span>
         </h1>
-        <p style='font-size: 22px !important; font-weight: 700 !important; 
-                  color: #374151 !important; margin: 25px 0 !important;'>
-            Shaping the Future Through Innovation and Research
+        <p class='hero-subtitle'>
+            Join a team of passionate innovators shaping tomorrow's technology. 
+            Located in the heart of Eruthoorkadai, we're revolutionizing research 
+            and development through cutting-edge innovation.
         </p>
         """, unsafe_allow_html=True)
         
-        st.markdown("""
-        <div style='margin: 35px 0; background: #f3f4f6; padding: 25px; 
-                    border-radius: 12px; border-left: 5px solid #000000;'>
-            <p style='font-size: 18px !important; line-height: 1.9 !important; 
-                      color: #111827 !important; font-weight: 500 !important;'>
-                At Altra Research, we're not just building technology — we're building the future. 
-                Located in the heart of <strong style='color: #000000 !important; 
-                font-size: 19px !important;'>Eruthoorkadai</strong>, we're on a mission to 
-                revolutionize research and development through cutting-edge innovation.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Stats
-        col_a, col_b, col_c = st.columns(3)
+        col_a, col_b = st.columns(2)
         with col_a:
-            st.markdown("""
-            <div class='feature-card pulse'>
-                <h2 style='font-size: 42px !important; font-weight: 900 !important; 
-                           color: #000000 !important; margin: 0 !important;'>500+</h2>
-                <p style='font-size: 17px !important; font-weight: 600 !important; 
-                          color: #374151 !important; margin-top: 10px !important;'>
-                    Projects Completed
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-        
+            if st.button("🚀 EXPLORE CAREERS", use_container_width=True, key="home_explore"):
+                st.session_state.selected = "💼 OPEN POSITIONS"
+                st.rerun()
         with col_b:
-            st.markdown("""
-            <div class='feature-card pulse' style='animation-delay: 0.3s;'>
-                <h2 style='font-size: 42px !important; font-weight: 900 !important; 
-                           color: #000000 !important; margin: 0 !important;'>150+</h2>
-                <p style='font-size: 17px !important; font-weight: 600 !important; 
-                          color: #374151 !important; margin-top: 10px !important;'>
-                    Happy Employees
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col_c:
-            st.markdown("""
-            <div class='feature-card pulse' style='animation-delay: 0.6s;'>
-                <h2 style='font-size: 42px !important; font-weight: 900 !important; 
-                           color: #000000 !important; margin: 0 !important;'>50+</h2>
-                <p style='font-size: 17px !important; font-weight: 600 !important; 
-                          color: #374151 !important; margin-top: 10px !important;'>
-                    Open Positions
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
+            if st.button("📝 APPLY NOW", use_container_width=True, key="home_apply"):
+                st.session_state.selected = "📝 APPLY NOW"
+                st.rerun()
     
     with col2:
         st.markdown("""
-        <div style='text-align: center; padding: 50px 20px; background: #f3f4f6; 
-                    border-radius: 15px; border: 3px solid #d1d5db;'>
-            <div style='font-size: 120px;'>🏢</div>
-            <h3 style='font-size: 24px !important; font-weight: 800 !important; 
-                       color: #000000 !important; margin-top: 25px !important;'>
-                Join Our Team
-            </h3>
-            <p style='font-size: 17px !important; font-weight: 600 !important; 
-                      color: #374151 !important;'>
-                Build your career with us
-            </p>
+        <div style='text-align: center; padding: 40px 20px; background: linear-gradient(135deg, rgba(79,70,229,0.05), rgba(124,58,237,0.05)); 
+                    border-radius: 24px; border: 2px solid rgba(79,70,229,0.1);'>
+            <div style='font-size: 150px; animation: float 4s ease-in-out infinite;'>🏢</div>
+            <h3 style='font-size: 22px; font-weight: 700; color: #1e293b; margin-top: 20px;'>Your Dream Career Awaits</h3>
+            <p style='font-size: 16px; color: #64748b; font-weight: 500;'>500+ Projects | 150+ Team Members | 50+ Open Roles</p>
         </div>
         """, unsafe_allow_html=True)
     
-    # Features Section
-    st.markdown("<h2 style='text-align: center; margin: 50px 0 35px; font-size: 34px !important; font-weight: 900 !important; color: #000000 !important;'>Why Join Altra Research?</h2>", unsafe_allow_html=True)
+    # STATS
+    st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
+    
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.markdown("""
+        <div class='stat-card'>
+            <div class='stat-number'>500+</div>
+            <div class='stat-label'>Projects Completed</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown("""
+        <div class='stat-card'>
+            <div class='stat-number'>150+</div>
+            <div class='stat-label'>Team Members</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col3:
+        st.markdown("""
+        <div class='stat-card'>
+            <div class='stat-number'>50+</div>
+            <div class='stat-label'>Open Positions</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col4:
+        st.markdown("""
+        <div class='stat-card'>
+            <div class='stat-number'>20+</div>
+            <div class='stat-label'>Countries</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # FEATURES
+    st.markdown("<div class='section-divider'></div>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; font-size: 36px; font-weight: 900; color: #0f172a; margin: 40px 0;'>Why Choose Altra Research?</h2>", unsafe_allow_html=True)
     
     features = [
-        {"icon": "🚀", "title": "Innovation First", "description": "Work on cutting-edge projects that push the boundaries of technology and science"},
-        {"icon": "🌱", "title": "Growth Opportunities", "description": "Continuous learning programs, mentorship, and clear career advancement paths"},
-        {"icon": "🤝", "title": "Collaborative Culture", "description": "Be part of a supportive, diverse team that values your unique ideas and contributions"},
-        {"icon": "💼", "title": "Work-Life Balance", "description": "Flexible working hours, remote options, and generous paid time off policies"},
-        {"icon": "🏆", "title": "Competitive Benefits", "description": "Top-tier salary packages, comprehensive health insurance, and performance bonuses"},
-        {"icon": "🌍", "title": "Global Impact", "description": "Your innovations will impact millions of users and industries worldwide"}
+        {"icon": "🚀", "title": "Innovation First", "desc": "Push boundaries with cutting-edge projects that redefine technology and science."},
+        {"icon": "📈", "title": "Career Growth", "desc": "Clear advancement paths, mentorship programs, and continuous learning opportunities."},
+        {"icon": "🤝", "title": "Amazing Culture", "desc": "Inclusive, diverse, and collaborative environment where every voice matters."},
+        {"icon": "💎", "title": "Top Benefits", "desc": "Competitive salary, health insurance, stock options, and performance bonuses."},
+        {"icon": "🌍", "title": "Global Impact", "desc": "Your work will impact millions of users across 20+ countries worldwide."},
+        {"icon": "⚖️", "title": "Work-Life Balance", "desc": "Flexible hours, remote options, and generous PTO to keep you at your best."}
     ]
     
     cols = st.columns(3)
@@ -629,440 +817,415 @@ def home_page():
         with cols[idx % 3]:
             st.markdown(f"""
             <div class='feature-card' style='animation-delay: {idx * 0.1}s;'>
-                <div style='font-size: 50px; margin-bottom: 15px;'>{feature['icon']}</div>
-                <h3 style='font-size: 20px !important; font-weight: 800 !important; 
-                           color: #000000 !important; margin-bottom: 12px !important;'>
-                    {feature['title']}
-                </h3>
-                <p style='font-size: 16px !important; font-weight: 500 !important; 
-                          color: #374151 !important; line-height: 1.7 !important;'>
-                    {feature['description']}
-                </p>
+                <span class='feature-icon'>{feature['icon']}</span>
+                <h3 class='feature-title'>{feature['title']}</h3>
+                <p class='feature-desc'>{feature['desc']}</p>
             </div>
             """, unsafe_allow_html=True)
     
-    # CTA Section
+    # CTA
     st.markdown("""
-    <div style='text-align: center; margin: 50px 0; padding: 55px 30px; 
-                background: #000000; border-radius: 20px; border: 3px solid #000000;'>
-        <h2 style='font-size: 34px !important; font-weight: 900 !important; 
-                   color: #ffffff !important; margin-bottom: 15px !important;'>
-            Ready to Make an Impact?
+    <div style='text-align: center; margin: 50px 0; padding: 60px 40px; 
+                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+                border-radius: 24px; box-shadow: 0 25px 60px rgba(79,70,229,0.3);'>
+        <h2 style='font-size: 36px; font-weight: 900; color: #ffffff; margin-bottom: 15px;'>
+            Ready to Make History?
         </h2>
-        <p style='font-size: 20px !important; font-weight: 600 !important; 
-                  color: #d1d5db !important; margin-bottom: 35px !important;'>
-            Join our team of innovators and shape the future together
+        <p style='font-size: 20px; font-weight: 500; color: #e0e7ff; margin-bottom: 30px;'>
+            Join us and be part of something extraordinary
         </p>
     </div>
     """, unsafe_allow_html=True)
     
     col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
     with col_btn2:
-        if st.button("🚀 EXPLORE OPEN POSITIONS", key="explore_btn", use_container_width=True):
-            st.session_state.selected = "💼 Jobs"
+        if st.button("🔥 VIEW ALL OPEN POSITIONS", use_container_width=True, key="cta_explore"):
+            st.session_state.selected = "💼 OPEN POSITIONS"
             st.rerun()
     
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Jobs Page
+# ═══════════════════════════════════════════════
+# JOBS PAGE
+# ═══════════════════════════════════════════════
 def jobs_page():
     st.markdown("<div class='main-container'>", unsafe_allow_html=True)
     
-    st.markdown("<h1 style='text-align: center; font-size: 38px !important; font-weight: 900 !important; color: #000000 !important; margin-bottom: 35px;'>OPEN POSITIONS</h1>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='text-align: center; margin-bottom: 40px;'>
+        <span class='hero-badge'>💼 Career Opportunities</span>
+        <h1 style='font-size: 40px; font-weight: 900; color: #0f172a; margin: 20px 0 10px;'>
+            Find Your Perfect Role
+        </h1>
+        <p style='font-size: 18px; color: #64748b; font-weight: 500;'>
+            Discover opportunities that match your skills and passion
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Search and filter
     col1, col2, col3 = st.columns([2, 1, 1])
     with col1:
-        search = st.text_input("🔍 SEARCH POSITIONS", key="job_search", placeholder="Type job title or skill...")
+        search = st.text_input("🔍 SEARCH POSITIONS", placeholder="Job title, skill, or keyword...")
     with col2:
-        department = st.selectbox("DEPARTMENT", ["All", "Research", "Development", "Design", "Marketing", "HR"])
+        department = st.selectbox("📂 DEPARTMENT", ["All", "Research", "Development", "Design", "Marketing", "HR"])
     with col3:
-        job_type = st.selectbox("JOB TYPE", ["All", "Full-Time", "Part-Time", "Remote", "Contract"])
+        job_type = st.selectbox("⏰ JOB TYPE", ["All", "Full-Time", "Part-Time", "Remote", "Contract"])
     
     jobs = [
         {
             "title": "Senior Research Scientist",
-            "department": "Research",
+            "dept": "Research",
             "type": "Full-Time",
-            "experience": "5-8 years",
-            "description": "Lead research initiatives in AI and machine learning. Develop innovative solutions for complex problems.",
-            "skills": ["Python", "TensorFlow", "PyTorch", "Research"],
+            "exp": "5-8 Years",
+            "desc": "Lead groundbreaking research initiatives in Artificial Intelligence and Machine Learning. Develop innovative algorithms that solve real-world problems.",
+            "skills": ["Python", "TensorFlow", "PyTorch", "Deep Learning"],
             "salary": "₹15-25 LPA"
         },
         {
             "title": "Full Stack Developer",
-            "department": "Development",
+            "dept": "Development",
             "type": "Full-Time",
-            "experience": "3-5 years",
-            "description": "Build scalable web applications using modern technologies. Work on both frontend and backend.",
-            "skills": ["React", "Node.js", "Python", "AWS"],
+            "exp": "3-5 Years",
+            "desc": "Design and build scalable web applications using cutting-edge technologies. Work across the entire stack from database to user interface.",
+            "skills": ["React", "Node.js", "Python", "AWS", "Docker"],
             "salary": "₹12-20 LPA"
         },
         {
             "title": "UI/UX Designer",
-            "department": "Design",
+            "dept": "Design",
             "type": "Remote",
-            "experience": "2-4 years",
-            "description": "Create intuitive and beautiful user interfaces. Conduct user research and testing.",
-            "skills": ["Figma", "Adobe XD", "User Research", "Prototyping"],
+            "exp": "2-4 Years",
+            "desc": "Create stunning, intuitive interfaces that delight users. Conduct research, prototyping, and testing to deliver exceptional experiences.",
+            "skills": ["Figma", "Adobe XD", "Prototyping", "User Research"],
             "salary": "₹8-15 LPA"
         },
         {
             "title": "Data Analyst",
-            "department": "Research",
+            "dept": "Research",
             "type": "Full-Time",
-            "experience": "2-5 years",
-            "description": "Analyze complex data sets to drive business decisions. Create insightful dashboards and reports.",
-            "skills": ["SQL", "Python", "Power BI", "Statistics"],
+            "exp": "2-5 Years",
+            "desc": "Transform raw data into actionable insights. Build dashboards and reports that drive strategic business decisions.",
+            "skills": ["SQL", "Python", "Power BI", "Statistics", "Excel"],
             "salary": "₹10-18 LPA"
         },
         {
-            "title": "Marketing Manager",
-            "department": "Marketing",
+            "title": "Marketing Lead",
+            "dept": "Marketing",
             "type": "Full-Time",
-            "experience": "4-7 years",
-            "description": "Develop and execute marketing strategies. Lead brand awareness and growth campaigns.",
-            "skills": ["Digital Marketing", "SEO", "Content Strategy", "Analytics"],
-            "salary": "₹12-20 LPA"
+            "exp": "4-7 Years",
+            "desc": "Spearhead marketing campaigns that amplify our brand. Drive growth through digital strategies and creative storytelling.",
+            "skills": ["Digital Marketing", "SEO/SEM", "Content Strategy", "Analytics"],
+            "salary": "₹12-22 LPA"
         },
         {
-            "title": "HR Coordinator",
-            "department": "HR",
-            "type": "Part-Time",
-            "experience": "1-3 years",
-            "description": "Support HR operations and employee engagement. Manage end-to-end recruitment processes.",
-            "skills": ["Recruitment", "Employee Relations", "HRIS"],
-            "salary": "₹5-8 LPA"
+            "title": "HR Business Partner",
+            "dept": "HR",
+            "type": "Full-Time",
+            "exp": "3-6 Years",
+            "desc": "Shape our company culture and drive talent strategy. Partner with leadership to build high-performing teams.",
+            "skills": ["Talent Acquisition", "Employee Relations", "HR Analytics"],
+            "salary": "₹8-14 LPA"
         }
     ]
     
-    # Filter jobs
-    filtered_jobs = jobs
+    filtered = jobs
     if search:
-        filtered_jobs = [j for j in filtered_jobs if search.lower() in j['title'].lower() 
-                        or search.lower() in j['description'].lower() 
-                        or search.lower() in ' '.join(j['skills']).lower()]
+        filtered = [j for j in filtered if search.lower() in j['title'].lower() 
+                    or search.lower() in j['desc'].lower()
+                    or any(search.lower() in s.lower() for s in j['skills'])]
     if department != "All":
-        filtered_jobs = [j for j in filtered_jobs if j['department'] == department]
+        filtered = [j for j in filtered if j['dept'] == department]
     if job_type != "All":
-        filtered_jobs = [j for j in filtered_jobs if j['type'] == job_type]
+        filtered = [j for j in filtered if j['type'] == job_type]
     
-    if len(filtered_jobs) == 0:
-        st.warning("⚠️ No jobs found matching your criteria. Try adjusting your filters.")
+    if not filtered:
+        st.warning("😔 No positions match your criteria. Try adjusting your filters!")
     
-    # Display jobs
-    for idx, job in enumerate(filtered_jobs):
-        with st.container():
-            st.markdown(f"""
-            <div class='job-card'>
-                <div style='display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 25px;'>
-                    <div style='flex: 2; min-width: 280px;'>
-                        <h3 style='font-size: 22px !important; font-weight: 800 !important; 
-                                   color: #000000 !important; margin: 0 0 12px 0 !important;'>
-                            {job['title']}
-                        </h3>
-                        <p style='font-size: 16px !important; font-weight: 500 !important; 
-                                  color: #374151 !important; margin: 15px 0 !important; line-height: 1.8 !important;'>
-                            {job['description']}
-                        </p>
-                        <div style='margin: 20px 0;'>
-                            <span class='badge'>📍 {job['department']}</span>
-                            <span class='badge'>⏰ {job['type']}</span>
-                            <span class='badge'>💼 {job['experience']}</span>
-                            <span class='badge'>💰 {job['salary']}</span>
-                        </div>
+    for idx, job in enumerate(filtered):
+        st.markdown(f"""
+        <div class='job-card' style='animation-delay: {idx * 0.1}s;'>
+            <div style='display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px;'>
+                <div style='flex: 2; min-width: 300px;'>
+                    <h3 class='job-title'>{job['title']}</h3>
+                    <p class='job-company'>Altra Research • Eruthoorkadai</p>
+                    <p class='job-desc'>{job['desc']}</p>
+                    <div style='margin: 15px 0;'>
+                        <span class='badge badge-primary'>📍 {job['dept']}</span>
+                        <span class='badge badge-success'>⏰ {job['type']}</span>
+                        <span class='badge badge-warning'>💼 {job['exp']}</span>
+                        <span class='badge badge-purple'>💰 {job['salary']}</span>
                     </div>
-                    <div style='flex: 1; min-width: 220px; background: #f3f4f6; padding: 20px; 
-                                border-radius: 12px; border: 2px solid #d1d5db;'>
-                        <p style='font-size: 16px !important; font-weight: 700 !important; 
-                                  color: #000000 !important; margin-bottom: 12px !important;'>
-                            REQUIRED SKILLS:
-                        </p>
-                        <p style='font-size: 16px !important; font-weight: 500 !important; 
-                                  color: #374151 !important; line-height: 2 !important;'>
-                            {'<br>• '.join([''] + job['skills'])}
-                        </p>
+                </div>
+                <div style='flex: 1; min-width: 220px; background: #f8fafc; padding: 20px; 
+                            border-radius: 15px; border: 1px solid #e2e8f0;'>
+                    <p style='font-size: 14px; font-weight: 700; color: #4f46e5; margin-bottom: 10px;'>
+                        🎯 REQUIRED SKILLS
+                    </p>
+                    <div style='line-height: 2.2;'>
+                        {''.join([f'<span class="badge badge-info" style="margin:3px;">{skill}</span>' for skill in job['skills']])}
                     </div>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
-            
-            if st.button(f"APPLY FOR {job['title'].upper()}", key=f"apply_{idx}"):
-                st.session_state['apply_position'] = job['title']
-                st.session_state.selected = "📝 Apply Now"
-                st.rerun()
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button(f"⚡ APPLY FOR {job['title'].upper()}", key=f"apply_btn_{idx}", use_container_width=True):
+            st.session_state['apply_position'] = job['title']
+            st.session_state.selected = "📝 APPLY NOW"
+            st.rerun()
     
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Apply Page
+# ═══════════════════════════════════════════════
+# APPLY PAGE
+# ═══════════════════════════════════════════════
 def apply_page():
     st.markdown("<div class='main-container'>", unsafe_allow_html=True)
     
-    st.markdown("<h1 style='text-align: center; font-size: 38px !important; font-weight: 900 !important; color: #000000 !important;'>JOB APPLICATION FORM</h1>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='text-align: center; margin-bottom: 30px;'>
+        <span class='hero-badge'>📝 Join Our Team</span>
+        <h1 style='font-size: 38px; font-weight: 900; color: #0f172a; margin: 20px 0 10px;'>
+            Application Form
+        </h1>
+        <p style='font-size: 18px; color: #64748b; font-weight: 500;'>
+            Take the first step towards an amazing career
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    st.markdown("<p style='font-size: 18px !important; font-weight: 700 !important; color: #000000 !important; margin: 20px 0;'>APPLICATION PROGRESS</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 10px;'>📊 APPLICATION PROGRESS</p>", unsafe_allow_html=True)
     progress_bar = st.progress(0)
     
-    with st.form("job_application", clear_on_submit=False):
+    with st.form("application_form", clear_on_submit=False):
         col1, col2 = st.columns(2)
         
         with col1:
-            full_name = st.text_input("FULL NAME *", placeholder="Enter your full name")
-            email = st.text_input("EMAIL ADDRESS *", placeholder="your.email@example.com")
-            phone = st.text_input("PHONE NUMBER *", placeholder="+91 98765 43210")
+            full_name = st.text_input("👤 FULL NAME *", placeholder="John Doe")
+            email = st.text_input("📧 EMAIL ADDRESS *", placeholder="john@example.com")
+            phone = st.text_input("📞 PHONE NUMBER *", placeholder="+91 9876543210")
             
         with col2:
-            default_position = st.session_state.get('apply_position', 'Select Position')
-            positions = ["Select Position", "Senior Research Scientist", "Full Stack Developer",
-                        "UI/UX Designer", "Data Analyst", "Marketing Manager", "HR Coordinator"]
+            positions_list = ["Select Position", "Senior Research Scientist", "Full Stack Developer",
+                            "UI/UX Designer", "Data Analyst", "Marketing Lead", "HR Business Partner"]
+            default_pos = st.session_state.get('apply_position', 'Select Position')
+            default_idx = positions_list.index(default_pos) if default_pos in positions_list else 0
             
-            default_index = positions.index(default_position) if default_position in positions else 0
-                
-            position = st.selectbox("POSITION APPLIED FOR *", positions, index=default_index)
-            experience = st.number_input("YEARS OF EXPERIENCE *", min_value=0, max_value=30, value=0)
-            education = st.selectbox("HIGHEST EDUCATION *", 
-                                    ["Select Education", "High School", "Bachelor's Degree", 
-                                     "Master's Degree", "PhD", "Other"])
+            position = st.selectbox("💼 POSITION *", positions_list, index=default_idx)
+            experience = st.number_input("⏳ YEARS OF EXPERIENCE *", 0, 30, 0)
+            education = st.selectbox("🎓 HIGHEST EDUCATION *", 
+                                    ["Select", "High School", "Bachelor's", "Master's", "PhD", "Other"])
         
-        skills = st.text_input("KEY SKILLS * (comma separated)", placeholder="Python, Machine Learning, Data Analysis")
-        cover_letter = st.text_area("COVER LETTER", placeholder="Tell us why you're perfect for this role...", height=150)
+        skills = st.text_input("🎯 KEY SKILLS * (comma separated)", placeholder="Python, Machine Learning, React, SQL...")
+        cover_letter = st.text_area("✍️ COVER LETTER", placeholder="Tell us why you'd be perfect for this role...", height=150)
+        resume = st.file_uploader("📄 UPLOAD RESUME (PDF/DOC)", type=['pdf', 'doc', 'docx'])
         
-        uploaded_file = st.file_uploader("UPLOAD RESUME (PDF/DOC)", type=['pdf', 'doc', 'docx'])
+        fields_done = sum([bool(full_name), bool(email), bool(phone), 
+                          position != "Select Position", experience >= 0, 
+                          education != "Select", bool(skills)])
+        progress_bar.progress(fields_done / 7)
         
-        # Update progress
-        fields_completed = sum([bool(full_name), bool(email), bool(phone), 
-                               position != "Select Position", experience >= 0, 
-                               education != "Select Education", bool(skills)])
-        progress = fields_completed / 7
-        progress_bar.progress(progress)
-        
-        submitted = st.form_submit_button("SUBMIT APPLICATION 🚀")
+        submitted = st.form_submit_button("🚀 SUBMIT APPLICATION")
         
         if submitted:
             errors = []
-            if not full_name:
-                errors.append("FULL NAME is required")
-            if not email or not is_valid_email(email):
-                errors.append("VALID EMAIL is required")
-            if not phone or not is_valid_phone(phone):
-                errors.append("VALID PHONE NUMBER is required")
-            if position == "Select Position":
-                errors.append("Please SELECT A POSITION")
-            if education == "Select Education":
-                errors.append("Please select EDUCATION LEVEL")
-            if not skills:
-                errors.append("SKILLS are required")
+            if not full_name: errors.append("Full name is required")
+            if not email or not is_valid_email(email): errors.append("Valid email is required")
+            if not phone or not is_valid_phone(phone): errors.append("Valid phone number is required")
+            if position == "Select Position": errors.append("Select a position")
+            if education == "Select": errors.append("Select education level")
+            if not skills: errors.append("Skills are required")
             
             if errors:
                 for error in errors:
-                    st.markdown(f"""
-                    <div class='error-message'>
-                        <strong>❌ {error}</strong>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f'<div class="error-box">❌ {error}</div>', unsafe_allow_html=True)
             else:
-                application_data = {
-                    'full_name': full_name,
-                    'email': email,
-                    'phone': phone,
-                    'position': position,
-                    'experience': experience,
-                    'education': education,
-                    'skills': skills,
+                save_application({
+                    'full_name': full_name, 'email': email, 'phone': phone,
+                    'position': position, 'experience': experience,
+                    'education': education, 'skills': skills,
                     'cover_letter': cover_letter
-                }
-                save_application(application_data)
+                })
                 
                 st.markdown("""
-                <div class='success-message'>
-                    <h2 style='font-size: 26px !important; font-weight: 800 !important; 
-                               color: #ffffff !important; margin: 0 0 15px 0 !important;'>
-                        ✅ APPLICATION SUBMITTED SUCCESSFULLY!
-                    </h2>
-                    <p style='font-size: 18px !important; font-weight: 600 !important; 
-                              color: #e5e7eb !important; margin: 12px 0 !important;'>
-                        Thank you for your interest in joining Altra Research.
-                    </p>
-                    <p style='font-size: 17px !important; font-weight: 500 !important; 
-                              color: #d1d5db !important; margin: 8px 0 !important;'>
-                        We'll review your application and get back to you within 5-7 business days.
-                    </p>
-                    <p style='font-size: 16px !important; font-weight: 600 !important; 
-                              color: #ffffff !important; margin: 8px 0 !important;'>
-                        📧 Contact: altraresearch@gmail.com
-                    </p>
+                <div class='success-box'>
+                    <h2>🎉 Application Submitted Successfully!</h2>
+                    <p style='margin: 12px 0;'>Thank you for your interest in joining <strong>Altra Research</strong>.</p>
+                    <p style='margin: 8px 0;'>⏰ We'll review your application and respond within <strong>5-7 business days</strong>.</p>
+                    <p style='margin: 8px 0;'>📧 Questions? Contact us at <strong>altraresearch@gmail.com</strong></p>
                 </div>
                 """, unsafe_allow_html=True)
                 
                 st.balloons()
-                time.sleep(0.5)
+                time.sleep(0.3)
                 st.snow()
     
     st.markdown("</div>", unsafe_allow_html=True)
 
-# About Page
+# ═══════════════════════════════════════════════
+# ABOUT PAGE
+# ═══════════════════════════════════════════════
 def about_page():
     st.markdown("<div class='main-container'>", unsafe_allow_html=True)
     
-    st.markdown("<h1 style='text-align: center; font-size: 38px !important; font-weight: 900 !important; color: #000000 !important;'>ABOUT ALTRA RESEARCH</h1>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='text-align: center; margin-bottom: 40px;'>
+        <span class='hero-badge'>ℹ️ Our Story</span>
+        <h1 style='font-size: 38px; font-weight: 900; color: #0f172a; margin: 20px 0 10px;'>
+            About Altra Research
+        </h1>
+    </div>
+    """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
     with col1:
         st.markdown("""
-        <div style='padding: 25px;'>
-            <h2 style='font-size: 28px !important; font-weight: 800 !important; 
-                       color: #000000 !important;'>OUR STORY</h2>
-            <p style='font-size: 18px !important; line-height: 1.9 !important; 
-                      color: #111827 !important; font-weight: 500 !important;'>
-                Founded in 2015, Altra Research has grown from a small startup in 
-                <strong style='color: #000000 !important; font-size: 19px !important; 
-                background: #fef08a; padding: 2px 8px; border-radius: 4px;'>
-                Eruthoorkadai</strong> to a leading research and development company. 
-                Our mission is to push the boundaries of technology and create solutions 
-                that make a real difference in people's lives.
+        <div style='padding: 10px;'>
+            <h2 style='font-size: 28px; font-weight: 800; color: #4f46e5; margin-bottom: 20px;'>🚀 Our Journey</h2>
+            <p style='font-size: 17px; font-weight: 500; color: #334155; line-height: 1.9;'>
+                Founded in <strong>2015</strong> in the innovation hub of 
+                <strong style='color: #4f46e5; background: #eef2ff; padding: 3px 10px; border-radius: 6px;'>
+                Eruthoorkadai</strong>, Altra Research began as a small team with a big vision. 
+                Today, we're a leading research and development powerhouse with 150+ brilliant minds 
+                working on technologies that shape the future.
             </p>
             
-            <h3 style='font-size: 24px !important; font-weight: 800 !important; 
-                       color: #000000 !important; margin-top: 35px !important;'>OUR VALUES</h3>
-            <ul style='list-style-type: none; padding: 0;'>
-                <li style='margin: 18px 0; font-size: 18px !important; font-weight: 600 !important; color: #111827 !important;'>
-                    <span style='font-size: 24px;'>🎯</span> 
-                    <strong style='color: #000000 !important; font-size: 19px !important;'>INNOVATION</strong> 
-                    <span style='color: #374151 !important;'>- We dare to think differently</span>
-                </li>
-                <li style='margin: 18px 0; font-size: 18px !important; font-weight: 600 !important; color: #111827 !important;'>
-                    <span style='font-size: 24px;'>🤝</span> 
-                    <strong style='color: #000000 !important; font-size: 19px !important;'>INTEGRITY</strong> 
-                    <span style='color: #374151 !important;'>- We do the right thing, always</span>
-                </li>
-                <li style='margin: 18px 0; font-size: 18px !important; font-weight: 600 !important; color: #111827 !important;'>
-                    <span style='font-size: 24px;'>👥</span> 
-                    <strong style='color: #000000 !important; font-size: 19px !important;'>COLLABORATION</strong> 
-                    <span style='color: #374151 !important;'>- Together we achieve more</span>
-                </li>
-                <li style='margin: 18px 0; font-size: 18px !important; font-weight: 600 !important; color: #111827 !important;'>
-                    <span style='font-size: 24px;'>📈</span> 
-                    <strong style='color: #000000 !important; font-size: 19px !important;'>EXCELLENCE</strong> 
-                    <span style='color: #374151 !important;'>- We strive for the best in everything</span>
-                </li>
-            </ul>
+            <h3 style='font-size: 22px; font-weight: 800; color: #0f172a; margin-top: 35px;'>💎 Our Core Values</h3>
+            <div style='margin-top: 20px;'>
+                <div style='margin: 15px 0; font-size: 17px; font-weight: 500; color: #334155;'>
+                    <span style='font-size: 24px; margin-right: 10px;'>🎯</span>
+                    <strong style='color: #4f46e5;'>Innovation</strong> — We challenge conventions and think differently
+                </div>
+                <div style='margin: 15px 0; font-size: 17px; font-weight: 500; color: #334155;'>
+                    <span style='font-size: 24px; margin-right: 10px;'>🤝</span>
+                    <strong style='color: #4f46e5;'>Integrity</strong> — We do what's right, always
+                </div>
+                <div style='margin: 15px 0; font-size: 17px; font-weight: 500; color: #334155;'>
+                    <span style='font-size: 24px; margin-right: 10px;'>👥</span>
+                    <strong style='color: #4f46e5;'>Collaboration</strong> — Together we achieve the impossible
+                </div>
+                <div style='margin: 15px 0; font-size: 17px; font-weight: 500; color: #334155;'>
+                    <span style='font-size: 24px; margin-right: 10px;'>⭐</span>
+                    <strong style='color: #4f46e5;'>Excellence</strong> — We strive for greatness in everything
+                </div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
     
     with col2:
         st.markdown("""
-        <div style='background: #000000; padding: 35px; border-radius: 15px; 
-                    border: 3px solid #000000; margin-top: 20px;'>
-            <h2 style='font-size: 28px !important; font-weight: 800 !important; 
-                       color: #ffffff !important; margin-bottom: 30px !important;'>
-                QUICK FACTS
-            </h2>
-            <div style='margin: 25px 0;'>
-                <h3 style='font-size: 18px !important; font-weight: 700 !important; 
-                           color: #ffffff !important;'>📍 LOCATION</h3>
-                <p style='font-size: 17px !important; font-weight: 500 !important; 
-                          color: #d1d5db !important;'>Eruthoorkadai, Tamil Nadu</p>
+        <div style='background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 35px; 
+                    border-radius: 20px; color: #ffffff; box-shadow: 0 20px 50px rgba(79,70,229,0.3);'>
+            <h2 style='font-size: 26px; font-weight: 800; color: #ffffff; margin-bottom: 30px;'>📊 Quick Facts</h2>
+            
+            <div style='margin: 25px 0; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 12px;'>
+                <h3 style='font-size: 16px; font-weight: 700; color: #e0e7ff;'>📍 Location</h3>
+                <p style='font-size: 18px; font-weight: 600; color: #ffffff;'>Eruthoorkadai, Tamil Nadu</p>
             </div>
-            <div style='margin: 25px 0;'>
-                <h3 style='font-size: 18px !important; font-weight: 700 !important; 
-                           color: #ffffff !important;'>👥 TEAM SIZE</h3>
-                <p style='font-size: 17px !important; font-weight: 500 !important; 
-                          color: #d1d5db !important;'>150+ Employees</p>
+            <div style='margin: 25px 0; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 12px;'>
+                <h3 style='font-size: 16px; font-weight: 700; color: #e0e7ff;'>👥 Team Size</h3>
+                <p style='font-size: 18px; font-weight: 600; color: #ffffff;'>150+ Employees</p>
             </div>
-            <div style='margin: 25px 0;'>
-                <h3 style='font-size: 18px !important; font-weight: 700 !important; 
-                           color: #ffffff !important;'>🏆 ACHIEVEMENTS</h3>
-                <p style='font-size: 17px !important; font-weight: 500 !important; 
-                          color: #d1d5db !important;'>Multiple Industry Awards</p>
+            <div style='margin: 25px 0; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 12px;'>
+                <h3 style='font-size: 16px; font-weight: 700; color: #e0e7ff;'>🏆 Achievements</h3>
+                <p style='font-size: 18px; font-weight: 600; color: #ffffff;'>Multiple Industry Awards</p>
             </div>
-            <div style='margin: 25px 0;'>
-                <h3 style='font-size: 18px !important; font-weight: 700 !important; 
-                           color: #ffffff !important;'>🌍 GLOBAL PRESENCE</h3>
-                <p style='font-size: 17px !important; font-weight: 500 !important; 
-                          color: #d1d5db !important;'>Clients in 20+ Countries</p>
+            <div style='margin: 25px 0; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 12px;'>
+                <h3 style='font-size: 16px; font-weight: 700; color: #e0e7ff;'>🌍 Global Reach</h3>
+                <p style='font-size: 18px; font-weight: 600; color: #ffffff;'>Clients in 20+ Countries</p>
             </div>
         </div>
         """, unsafe_allow_html=True)
     
-    # Timeline
-    st.markdown("<h2 style='text-align: center; font-size: 30px !important; font-weight: 900 !important; color: #000000 !important; margin: 50px 0 35px;'>OUR JOURNEY</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; font-size: 30px; font-weight: 900; color: #0f172a; margin: 50px 0 30px;'>📅 Our Timeline</h2>", unsafe_allow_html=True)
     
     timeline = [
-        {"year": "2015", "event": "Company Founded in Eruthoorkadai"},
-        {"year": "2017", "event": "Reached 50 Employees"},
-        {"year": "2019", "event": "Expanded to International Markets"},
-        {"year": "2021", "event": "Launched AI Research Division"},
-        {"year": "2023", "event": "500+ Projects Completed"},
-        {"year": "2024", "event": "Continuing to Innovate and Grow"}
+        ("2015", "Founded in Eruthoorkadai with a vision to revolutionize research"),
+        ("2017", "Grew to 50+ team members and secured first major contract"),
+        ("2019", "Expanded operations to international markets"),
+        ("2021", "Launched cutting-edge AI Research Division"),
+        ("2023", "Celebrated 500+ successful project deliveries"),
+        ("2025", "Continuing to innovate with 150+ employees and growing")
     ]
     
-    for item in timeline:
+    for year, event in timeline:
         st.markdown(f"""
-        <div style='display: flex; align-items: center; margin: 25px 0; padding: 15px; 
-                    background: #f9fafb; border-radius: 12px; border-left: 5px solid #000000;'>
-            <div class='timeline-year'>
-                {item['year']}
-            </div>
-            <div style='margin-left: 25px; font-size: 18px !important; font-weight: 600 !important; 
-                        color: #111827 !important;'>
-                {item['event']}
-            </div>
+        <div class='timeline-item'>
+            <div class='timeline-year'>{year}</div>
+            <div class='timeline-text'>{event}</div>
         </div>
         """, unsafe_allow_html=True)
     
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Contact Page
+# ═══════════════════════════════════════════════
+# CONTACT PAGE
+# ═══════════════════════════════════════════════
 def contact_page():
     st.markdown("<div class='main-container'>", unsafe_allow_html=True)
     
-    st.markdown("<h1 style='text-align: center; font-size: 38px !important; font-weight: 900 !important; color: #000000 !important;'>CONTACT US</h1>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='text-align: center; margin-bottom: 40px;'>
+        <span class='hero-badge'>📧 Get In Touch</span>
+        <h1 style='font-size: 38px; font-weight: 900; color: #0f172a; margin: 20px 0 10px;'>
+            Contact Us
+        </h1>
+        <p style='font-size: 18px; color: #64748b; font-weight: 500;'>
+            We'd love to hear from you
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
     with col1:
         st.markdown("""
-        <div style='padding: 25px;'>
-            <h2 style='font-size: 28px !important; font-weight: 800 !important; 
-                       color: #000000 !important;'>GET IN TOUCH</h2>
-            <p style='font-size: 18px !important; line-height: 1.8 !important; 
-                      color: #374151 !important; font-weight: 500 !important;'>
-                Have questions? We'd love to hear from you. Send us a message 
-                and we'll respond as soon as possible.
-            </p>
-            
-            <div style='margin: 35px 0;'>
-                <div style='margin: 22px 0; padding: 15px; background: #f3f4f6; 
-                            border-radius: 10px; border-left: 4px solid #000000;'>
-                    <span style='font-size: 28px;'>📍</span>
-                    <strong style='margin-left: 12px; font-size: 18px !important; color: #000000 !important;'>ADDRESS:</strong>
-                    <p style='margin-left: 45px; font-size: 17px !important; font-weight: 500 !important; color: #374151 !important;'>
-                        123 Research Park, Eruthoorkadai, Tamil Nadu - 627001
+        <h2 style='font-size: 26px; font-weight: 800; color: #4f46e5; margin-bottom: 25px;'>📍 Reach Us</h2>
+        
+        <div class='contact-card'>
+            <div style='display: flex; align-items: center;'>
+                <span style='font-size: 35px; margin-right: 20px;'>📍</span>
+                <div>
+                    <strong style='font-size: 18px; color: #0f172a;'>Our Office</strong>
+                    <p style='font-size: 16px; color: #475569; margin: 5px 0 0 0; font-weight: 500;'>
+                        123 Research Park,<br>Eruthoorkadai, Tamil Nadu - 627001
                     </p>
                 </div>
-                <div style='margin: 22px 0; padding: 15px; background: #f3f4f6; 
-                            border-radius: 10px; border-left: 4px solid #000000;'>
-                    <span style='font-size: 28px;'>📧</span>
-                    <strong style='margin-left: 12px; font-size: 18px !important; color: #000000 !important;'>EMAIL:</strong>
-                    <p style='margin-left: 45px; font-size: 17px !important; font-weight: 600 !important; color: #1d4ed8 !important;'>
+            </div>
+        </div>
+        
+        <div class='contact-card'>
+            <div style='display: flex; align-items: center;'>
+                <span style='font-size: 35px; margin-right: 20px;'>📧</span>
+                <div>
+                    <strong style='font-size: 18px; color: #0f172a;'>Email</strong>
+                    <p style='font-size: 16px; color: #4f46e5; margin: 5px 0 0 0; font-weight: 600;'>
                         altraresearch@gmail.com
                     </p>
                 </div>
-                <div style='margin: 22px 0; padding: 15px; background: #f3f4f6; 
-                            border-radius: 10px; border-left: 4px solid #000000;'>
-                    <span style='font-size: 28px;'>📞</span>
-                    <strong style='margin-left: 12px; font-size: 18px !important; color: #000000 !important;'>PHONE:</strong>
-                    <p style='margin-left: 45px; font-size: 17px !important; font-weight: 500 !important; color: #374151 !important;'>
+            </div>
+        </div>
+        
+        <div class='contact-card'>
+            <div style='display: flex; align-items: center;'>
+                <span style='font-size: 35px; margin-right: 20px;'>📞</span>
+                <div>
+                    <strong style='font-size: 18px; color: #0f172a;'>Phone</strong>
+                    <p style='font-size: 16px; color: #475569; margin: 5px 0 0 0; font-weight: 500;'>
                         +91 98765 43210
                     </p>
                 </div>
-                <div style='margin: 22px 0; padding: 15px; background: #f3f4f6; 
-                            border-radius: 10px; border-left: 4px solid #000000;'>
-                    <span style='font-size: 28px;'>🕐</span>
-                    <strong style='margin-left: 12px; font-size: 18px !important; color: #000000 !important;'>WORKING HOURS:</strong>
-                    <p style='margin-left: 45px; font-size: 17px !important; font-weight: 500 !important; color: #374151 !important;'>
-                        Monday - Friday: 9:00 AM - 6:00 PM
+            </div>
+        </div>
+        
+        <div class='contact-card'>
+            <div style='display: flex; align-items: center;'>
+                <span style='font-size: 35px; margin-right: 20px;'>🕐</span>
+                <div>
+                    <strong style='font-size: 18px; color: #0f172a;'>Working Hours</strong>
+                    <p style='font-size: 16px; color: #475569; margin: 5px 0 0 0; font-weight: 500;'>
+                        Monday - Friday<br>9:00 AM - 6:00 PM
                     </p>
                 </div>
             </div>
@@ -1071,68 +1234,41 @@ def contact_page():
     
     with col2:
         with st.form("contact_form"):
-            st.markdown("<h3 style='font-size: 24px !important; font-weight: 800 !important; color: #000000 !important;'>SEND US A MESSAGE</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 20px;'>💬 Send Message</h3>", unsafe_allow_html=True)
             
-            name = st.text_input("YOUR NAME *", placeholder="Enter your name")
-            email = st.text_input("YOUR EMAIL *", placeholder="your.email@example.com")
-            subject = st.text_input("SUBJECT", placeholder="What's this about?")
-            message = st.text_area("YOUR MESSAGE *", height=150, placeholder="Type your message here...")
+            name = st.text_input("YOUR NAME *", placeholder="John Doe")
+            email = st.text_input("YOUR EMAIL *", placeholder="john@example.com")
+            subject = st.text_input("SUBJECT", placeholder="How can we help?")
+            message = st.text_area("YOUR MESSAGE *", placeholder="Type your message here...", height=150)
             
-            submitted = st.form_submit_button("SEND MESSAGE 📨")
+            submitted = st.form_submit_button("📨 SEND MESSAGE")
             
             if submitted:
                 if name and email and message:
                     if is_valid_email(email):
                         conn = sqlite3.connect('altra_research.db')
                         c = conn.cursor()
-                        c.execute('''INSERT INTO messages (name, email, subject, message, date)
-                                    VALUES (?, ?, ?, ?, ?)''',
+                        c.execute('INSERT INTO messages (name, email, subject, message, date) VALUES (?, ?, ?, ?, ?)',
                                  (name, email, subject, message, datetime.now()))
                         conn.commit()
                         conn.close()
                         
                         st.markdown("""
-                        <div class='success-message'>
-                            <h3 style='font-size: 22px !important; font-weight: 800 !important; 
-                                       color: #ffffff !important;'>✅ MESSAGE SENT SUCCESSFULLY!</h3>
-                            <p style='font-size: 17px !important; font-weight: 600 !important; 
-                                      color: #e5e7eb !important;'>
-                                Thank you for reaching out. We'll get back to you within 24 hours.
-                            </p>
+                        <div class='success-box'>
+                            <h3>✅ Message Sent!</h3>
+                            <p>We'll respond within 24 hours.</p>
                         </div>
                         """, unsafe_allow_html=True)
                         st.balloons()
                     else:
-                        st.markdown("""
-                        <div class='error-message'>
-                            <strong>❌ Please enter a VALID EMAIL address.</strong>
-                        </div>
-                        """, unsafe_allow_html=True)
+                        st.markdown('<div class="error-box">❌ Invalid email address</div>', unsafe_allow_html=True)
                 else:
-                    st.markdown("""
-                    <div class='error-message'>
-                        <strong>❌ Please fill in ALL REQUIRED FIELDS.</strong>
-                    </div>
-                    """, unsafe_allow_html=True)
-    
-    # Map
-    st.markdown("""
-    <div style='text-align: center; margin: 35px 0; padding: 45px; 
-                background: #f3f4f6; border-radius: 15px; border: 3px dashed #6b7280;'>
-        <h3 style='font-size: 22px !important; font-weight: 800 !important; color: #000000 !important;'>
-            📍 OUR LOCATION
-        </h3>
-        <p style='font-size: 19px !important; font-weight: 600 !important; color: #374151 !important;'>
-            <strong>Eruthoorkadai, Tamil Nadu</strong>
-        </p>
-        <p style='font-size: 16px !important; font-weight: 500 !important; color: #6b7280 !important;'>
-            [Interactive Map Coming Soon]
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+                    st.markdown('<div class="error-box">❌ Fill all required fields</div>', unsafe_allow_html=True)
     
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Run the app
+# ═══════════════════════════════════════════════
+# RUN APP
+# ═══════════════════════════════════════════════
 if __name__ == "__main__":
     main()
